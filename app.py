@@ -58,7 +58,7 @@ VARIABLE_DISPLAY_NAMES = {
     'Potencial_Colza_has.': 'Potencial Colza (has)',
     'CuotaMercado_Zona_Colza': 'Cuota Mercado Zona Colza (%)',
     'Rendimiento_Colza_N (kg/ha)': 'Rendimiento Colza (kg/ha)',
-    'PrecAcum Septiembre 2024': 'Precipitación Acumulada Sept. 2024 (mm)',
+    'PrecAcum Septiembre 2024': 'Precipitación Acumulada Sept Año Actual (mm)',
     
     'Ventas_Girasol_N-1': 'Ventas Girasol Año Anterior (dosis)',
     'Visitas_Girasol_N': 'Visitas Girasol Año Actual',
@@ -67,7 +67,7 @@ VARIABLE_DISPLAY_NAMES = {
     'CuotaMercado_Zona_Girasol': 'Cuota Mercado Zona Girasol (%)',
     'Potencial_Girasol_has.': 'Potencial Girasol (has)',
     'Rendimiento_Girasol_N (kg/ha)': 'Rendimiento Girasol (kg/ha)',
-    'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': 'Precipitación Acumulada 2024 (mm)',
+    'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': 'Precipitación Acumulada Año Actual (mm)',
     
     'Ventas_Maiz_N-1': 'Ventas Maíz Año Anterior (dosis)',
     'Visitas_Maiz_N': 'Visitas Maíz Año Actual',
@@ -76,7 +76,7 @@ VARIABLE_DISPLAY_NAMES = {
     'CuotaMercado_Zona_Maiz': 'Cuota Mercado Zona Maíz (%)',
     'Potencial_Maiz_has.': 'Potencial Maíz (has)',
     'Rendimiento_Maiz_N (kg/ha)': 'Rendimiento Maíz (kg/ha)',
-    '% embalse abril N': 'Nivel Embalse Abril (%)'
+    '% embalse abril N': 'Nivel Embalse Abril Año Actual(%)'
 }
 # Configuración original para el cálculo
 CROP_VARIABLES_ORIGINAL = {
@@ -516,7 +516,7 @@ def main():
 
             except Exception as e:
                 st.error(f"Error en la predicción: {str(e)}")
-                
+
     with tab2:
         st.subheader("📈 Predicción Masiva desde Excel")
         
