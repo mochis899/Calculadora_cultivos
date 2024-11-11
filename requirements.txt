@@ -10,3 +10,4 @@ altair>=4.0.0
 pillow>=8.0.0
 protobuf>=3.20.0
 watchdog
+plotly  # Añade esta línea
