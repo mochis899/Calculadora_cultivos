@@ -28,28 +28,56 @@ VARIABLES_VALUES = {
     'Reclamaciones_Colza_N-1': ("No", "Sí", "Sí"),  # Cambiado a Sí/No
     'Jornada_Campo_Colza_N': ("No", "Sí", "No"),    # Cambiado a Sí/No
     'Potencial_Colza_has.': (0, 800, 5),
-    'CuotaMercado_Zona_Colza': (0, 100, 32),
-    'Rendimiento_Colza_N (kg/ha)': (1000, 4666, 1600),
+    'CuotaMercado_Zona_Colza': (0, 100, 0),
+    'Rendimiento_Colza_N (kg/ha)': (0, 4666, 1600),
     'PrecAcum Septiembre 2024': (0, 300, 34),
     'Ventas_Girasol_N-1': (0, 487, 5),
     'Visitas_Girasol_N': (0, 48, 0),
     'Reclamaciones_Girasol_N-1': ("No", "Sí", "Sí"),  # Cambiado a Sí/No
     'Jornada_Campo_Girasol_N': ("No", "Sí", "No"),    # Cambiado a Sí/No
-    'CuotaMercado_Zona_Girasol': (0, 100, 20),
-    'Potencial_Girasol_has.': (0, 6200, 40),
-    'Rendimiento_Girasol_N (kg/ha)': (1000, 2431, 1050),
+    'CuotaMercado_Zona_Girasol': (0, 100, 0),
+    'Potencial_Girasol_has.': (1, 6200, 40),
+    'Rendimiento_Girasol_N (kg/ha)': (0, 2431, 1050),
     'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': (0, 3000, 350),
     'Ventas_Maiz_N-1': (0, 1033, 4),
     'Visitas_Maiz_N': (0, 46, 0),
     'Reclamaciones_Maiz_N-1': ("No", "Sí", "Sí"),  # Cambiado a Sí/No
     'Jornada_Campo_Maiz_N': ("No", "Sí", "No"),    # Cambiado a Sí/No
-    'CuotaMercado_Zona_Maiz': (0, 100, 11),
-    'Potencial_Maiz_has.': (0, 835, 15),
-    'Rendimiento_Maiz_N (kg/ha)': (1000, 55000, 20000),
+    'CuotaMercado_Zona_Maiz': (0, 100, 0),
+    'Potencial_Maiz_has.': (1, 835, 15),
+    'Rendimiento_Maiz_N (kg/ha)': (0, 55000, 20000),
     '% embalse abril N': (0, 100, 77)
 }
 
-
+# Añadir este diccionario después de VARIABLES_VALUES
+VARIABLE_DISPLAY_NAMES = {
+    'Ventas_Colza_N-1': 'Ventas Colza Año Anterior (dosis)',
+    'Visitas_Colza_N': 'Visitas Colza Año Actual',
+    'Reclamaciones_Colza_N-1': 'Reclamaciones Colza Año Anterior',
+    'Jornada_Campo_Colza_N': 'Jornada Campo Colza Año Actual',
+    'Potencial_Colza_has.': 'Potencial Colza (has)',
+    'CuotaMercado_Zona_Colza': 'Cuota Mercado Zona Colza (%)',
+    'Rendimiento_Colza_N (kg/ha)': 'Rendimiento Colza (kg/ha)',
+    'PrecAcum Septiembre 2024': 'Precipitación Acumulada Sept. 2024 (mm)',
+    
+    'Ventas_Girasol_N-1': 'Ventas Girasol Año Anterior (dosis)',
+    'Visitas_Girasol_N': 'Visitas Girasol Año Actual',
+    'Reclamaciones_Girasol_N-1': 'Reclamaciones Girasol Año Anterior',
+    'Jornada_Campo_Girasol_N': 'Jornada Campo Girasol Año Actual',
+    'CuotaMercado_Zona_Girasol': 'Cuota Mercado Zona Girasol (%)',
+    'Potencial_Girasol_has.': 'Potencial Girasol (has)',
+    'Rendimiento_Girasol_N (kg/ha)': 'Rendimiento Girasol (kg/ha)',
+    'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': 'Precipitación Acumulada 2024 (mm)',
+    
+    'Ventas_Maiz_N-1': 'Ventas Maíz Año Anterior (dosis)',
+    'Visitas_Maiz_N': 'Visitas Maíz Año Actual',
+    'Reclamaciones_Maiz_N-1': 'Reclamaciones Maíz Año Anterior',
+    'Jornada_Campo_Maiz_N': 'Jornada Campo Maíz Año Actual',
+    'CuotaMercado_Zona_Maiz': 'Cuota Mercado Zona Maíz (%)',
+    'Potencial_Maiz_has.': 'Potencial Maíz (has)',
+    'Rendimiento_Maiz_N (kg/ha)': 'Rendimiento Maíz (kg/ha)',
+    '% embalse abril N': 'Nivel Embalse Abril (%)'
+}
 # Configuración original para el cálculo
 CROP_VARIABLES_ORIGINAL = {
     'colza': [
@@ -145,7 +173,10 @@ def create_template_excel():
     return output.getvalue()
 
 def process_excel_file(uploaded_file, models, scalers):
-    """Procesar archivo Excel y calcular probabilidades para cada cultivo."""
+    """
+    Procesar archivo Excel y calcular probabilidades para cada cultivo.
+    Maneja correctamente la conversión y escalado de la cuota de mercado.
+    """
     df = pd.read_excel(uploaded_file)
     
     cultivos_procesados = []
@@ -155,17 +186,32 @@ def process_excel_file(uploaded_file, models, scalers):
     for cultivo in ['colza', 'girasol', 'maiz']:
         # Obtener las variables necesarias para el cultivo
         variables = CROP_VARIABLES_ORIGINAL[cultivo]
+        potential_var = f'Potencial_{cultivo.title()}_has.'
+        market_share_var = f'CuotaMercado_Zona_{cultivo.title()}'
         
         # Verificar si todas las variables están presentes y tienen datos
         if all(var in df.columns for var in variables) and not df[variables].isna().any().any():
+            # Crear una copia del DataFrame para las modificaciones
+            df_temp = df.copy()
+            
+            # Convertir cuota de mercado de porcentaje a decimal ANTES del escalado
+            if market_share_var in df_temp.columns:
+                df_temp[market_share_var] = df_temp[market_share_var] / 100
+            
+            # Crear máscara para potencial 0
+            zero_potential_mask = df[potential_var] == 0
+            
             # Preparar datos para el modelo
-            X = df[variables]
+            X = df_temp[variables]
             
             # Escalar datos
             X_scaled = scalers[cultivo].transform(X)
             
             # Predecir probabilidades
             probabilities = models[cultivo].predict_proba(X_scaled)[:, 1] * 100
+            
+            # Establecer probabilidad 0 donde el potencial es 0
+            probabilities[zero_potential_mask] = 0.0
             
             # Añadir resultados al DataFrame original
             df[f'Probabilidad_{cultivo.title()}'] = probabilities
@@ -210,10 +256,31 @@ def load_models_and_scalers():
 def calculate_probability(selected_crop, input_values, models, scalers):
     """
     Calcula la probabilidad de compra usando el orden original de las variables.
+    Maneja correctamente la conversión y escalado de la cuota de mercado.
     """
-    # Obtener solo las variables necesarias en el orden correcto
+    # Comprobar el valor de potencial según el cultivo
+    potential_vars = {
+        'colza': 'Potencial_Colza_has.',
+        'girasol': 'Potencial_Girasol_has.',
+        'maiz': 'Potencial_Maiz_has.'
+    }
+    
+    # Si el potencial es 0, retornar 0% de probabilidad
+    if input_values[potential_vars[selected_crop]] == 0:
+        return 0.0
+    
+    # Crear una copia del diccionario de valores para no modificar el original
+    modified_values = input_values.copy()
+    
+    # Convertir la cuota de mercado de porcentaje a decimal ANTES del escalado
+    market_share_var = f'CuotaMercado_Zona_{selected_crop.title()}'
+    if market_share_var in modified_values:
+        # Si el usuario ingresa 8 (%), lo convertimos a 0.08 antes del escalado
+        modified_values[market_share_var] = modified_values[market_share_var] / 100
+    
+    # Continuar con el cálculo normal usando los valores modificados
     variables_ordered = CROP_VARIABLES_ORIGINAL[selected_crop]
-    input_df = pd.DataFrame([input_values])[variables_ordered]
+    input_df = pd.DataFrame([modified_values])[variables_ordered]
     
     # Escalar los datos y hacer la predicción
     scaler = scalers[selected_crop]
@@ -224,71 +291,96 @@ def calculate_probability(selected_crop, input_values, models, scalers):
 
 
 def create_crop_inputs(crop_name, variable_names):
-    """Crear inputs para un cultivo específico con inputs numéricos y deslizantes o opciones de Sí/No."""
+    """
+    Crear inputs para un cultivo específico con nombres de visualización mejorados.
+    """
     inputs = {}
     st.subheader(f"📊 Variables para {crop_name.title()}")
 
-    # Contenedor para todas las variables
     with st.container():
-        # Iterar sobre los nombres de las variables según el orden especificado
         for var_name in variable_names:
             min_val, max_val, default = VARIABLES_VALUES[var_name]
-
-            # Dividir en dos columnas para mantener un formato uniforme
+            
+            # Usar el nombre de visualización para la variable
+            display_name = VARIABLE_DISPLAY_NAMES.get(var_name, var_name)
+            
             col1, col2 = st.columns([1, 3])
-
-            # Verificar si la variable es de tipo Sí/No
+            
+            is_market_share = "CuotaMercado_Zona" in var_name
+            
             if min_val == "No" and max_val == "Sí":
                 with col1:
-                    # Input de selección Sí/No, ajustado al tamaño de col1
                     selected_value = st.selectbox(
-                        var_name,
+                        display_name,  # Usar nombre de visualización
                         options=["No", "Sí"],
                         index=0 if default == "No" else 1,
                         key=f"select_{var_name}",
                         label_visibility="visible"
                     )
-                    # Convertir Sí/No a 1/0 para los cálculos
                     inputs[var_name] = 1 if selected_value == "Sí" else 0
             else:
-                # Para variables numéricas
                 with col1:
-                    value = st.number_input(
-                        var_name,
-                        min_value=float(min_val),
-                        max_value=float(max_val),
-                        value=float(default),
-                        step=0.1,
-                        key=f"num_{var_name}"
-                    )
+                    if is_market_share:
+                        value = st.number_input(
+                            display_name,  # Usar nombre de visualización
+                            min_value=float(min_val),
+                            max_value=float(max_val),
+                            value=float(default),
+                            step=0.01,
+                            format="%.2f",
+                            key=f"num_{var_name}"
+                        )
+                    else:
+                        value = st.number_input(
+                            display_name,  # Usar nombre de visualización
+                            min_value=float(min_val),
+                            max_value=float(max_val),
+                            value=float(default),
+                            step=0.1,
+                            key=f"num_{var_name}"
+                        )
                 with col2:
-                    inputs[var_name] = st.slider(
-                        f"Deslizante {var_name}",
-                        min_value=float(min_val),
-                        max_value=float(max_val),
-                        value=float(value),
-                        step=0.1,
-                        key=f"slider_{var_name}",
-                        label_visibility="collapsed"
-                    )
+                    if is_market_share:
+                        inputs[var_name] = st.slider(
+                            f"Deslizante {display_name}",  # Usar nombre de visualización
+                            min_value=float(min_val),
+                            max_value=float(max_val),
+                            value=float(value),
+                            step=0.01,
+                            format="%.2f%%",
+                            key=f"slider_{var_name}",
+                            label_visibility="collapsed"
+                        )
+                    else:
+                        inputs[var_name] = st.slider(
+                            f"Deslizante {display_name}",  # Usar nombre de visualización
+                            min_value=float(min_val),
+                            max_value=float(max_val),
+                            value=float(value),
+                            step=0.1,
+                            key=f"slider_{var_name}",
+                            label_visibility="collapsed"
+                        )
     
     return inputs
     
 
 def display_feature_importance(model, feature_names):
     """
-    Visualiza la importancia de características para el modelo XGBoost utilizando plotly.
+    Visualiza la importancia de características usando nombres de visualización mejorados.
     """
     # Obtener la importancia de características del modelo
     feature_importances = model.get_booster().get_score(importance_type="weight")
     
-    # Convertir a un DataFrame para organizar los datos y ordenarlos
-    importance_df = pd.DataFrame({
-        'Variable': feature_names,
-        'Importancia (%)': [feature_importances.get(f, 0) * 100 for f in feature_names]  # Convertir a porcentaje
-    }).sort_values(by='Importancia (%)', ascending=True)  # Ordenar de menor a mayor para un gráfico horizontal
+    # Convertir los nombres de características a nombres de visualización
+    display_names = [VARIABLE_DISPLAY_NAMES.get(name, name) for name in feature_names]
     
-    # Crear gráfico de barras horizontal interactivo con plotly
+    # Convertir a un DataFrame para organizar los datos
+    importance_df = pd.DataFrame({
+        'Variable': display_names,
+        'Importancia (%)': [feature_importances.get(f, 0) * 100 for f in feature_names]
+    }).sort_values(by='Importancia (%)', ascending=True)
+    
     fig = px.bar(
         importance_df,
         x="Importancia (%)",
@@ -298,34 +390,30 @@ def display_feature_importance(model, feature_names):
         text="Importancia (%)"
     )
     
-    # Personalizar el diseño
     fig.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
     fig.update_layout(yaxis_title="Variable", xaxis_title="Importancia (%)", showlegend=False)
     
-    # Mostrar gráfico en Streamlit
     st.plotly_chart(fig)
-
 
 def display_shap_contributions_as_percentage(model, input_values, feature_names):
     """
-    Calcula y visualiza la contribución de cada variable a la predicción en términos porcentuales.
+    Calcula y visualiza la contribución de cada variable usando nombres de visualización mejorados.
     """
-    # Obtener valores SHAP para la predicción
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(input_values)[0]
     
-    # Calcular contribución en porcentaje
+    # Convertir los nombres de características a nombres de visualización
+    display_names = [VARIABLE_DISPLAY_NAMES.get(name, name) for name in feature_names]
+    
     shap_abs_values = np.abs(shap_values)
     total_contribution = np.sum(shap_abs_values)
     shap_percentages = (shap_abs_values / total_contribution) * 100
     
-    # Crear DataFrame para el gráfico
     shap_df = pd.DataFrame({
-        "Variable": feature_names,
+        "Variable": display_names,
         "Contribución (%)": shap_percentages
     }).sort_values(by="Contribución (%)", ascending=True)
 
-    # Crear gráfico de barras horizontal
     fig_shap_percent = px.bar(
         shap_df,
         x="Contribución (%)",
@@ -337,7 +425,6 @@ def display_shap_contributions_as_percentage(model, input_values, feature_names)
     fig_shap_percent.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
     fig_shap_percent.update_layout(yaxis_title="Variable", xaxis_title="Contribución (%)", showlegend=False)
     
-    # Mostrar el gráfico en Streamlit
     st.plotly_chart(fig_shap_percent)
 
 def main():
@@ -387,7 +474,15 @@ def main():
             st.subheader("🎯 Probabilidad de Compra")
 
             try:
-                # Calcular probabilidad usando el orden original de las variables
+                # Verificar si el potencial es 0
+                potential_vars = {
+                    'colza': 'Potencial_Colza_has.',
+                    'girasol': 'Potencial_Girasol_has.',
+                    'maiz': 'Potencial_Maiz_has.'
+                }
+                is_potential_zero = input_values[potential_vars[selected_crop]] == 0
+                
+                # Calcular probabilidad
                 prob = calculate_probability(selected_crop, input_values, models, scalers)
                 
                 # Mostrar resultado
@@ -398,7 +493,10 @@ def main():
                 
                 st.progress(prob / 100)
                 
-                if prob >= 75:
+                if is_potential_zero:
+                    st.warning("Baja probabilidad de compra")
+                    st.warning("Si este cliente no tiene hectáreas potenciales de este cultivo, su probabilidad será 0")
+                elif prob >= 75:
                     st.success("Alta probabilidad de compra")
                 elif prob >= 50:
                     st.info("Probabilidad moderada de compra")
@@ -418,7 +516,7 @@ def main():
 
             except Exception as e:
                 st.error(f"Error en la predicción: {str(e)}")
-
+                
     with tab2:
         st.subheader("📈 Predicción Masiva desde Excel")
         
