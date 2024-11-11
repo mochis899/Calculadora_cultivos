@@ -36,7 +36,7 @@ VARIABLES_VALUES = {
     'Reclamaciones_Girasol_N-1': ("No", "Sí", "Sí"),  # Cambiado a Sí/No
     'Jornada_Campo_Girasol_N': ("No", "Sí", "No"),    # Cambiado a Sí/No
     'CuotaMercado_Zona_Girasol': (0, 100, 0),
-    'Potencial_Girasol_has.': (1, 6200, 40),
+    'Potencial_Girasol_has.': (0, 6200, 40),
     'Rendimiento_Girasol_N (kg/ha)': (0, 2431, 1050),
     'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': (0, 3000, 350),
     'Ventas_Maiz_N-1': (0, 1033, 4),
@@ -44,7 +44,7 @@ VARIABLES_VALUES = {
     'Reclamaciones_Maiz_N-1': ("No", "Sí", "Sí"),  # Cambiado a Sí/No
     'Jornada_Campo_Maiz_N': ("No", "Sí", "No"),    # Cambiado a Sí/No
     'CuotaMercado_Zona_Maiz': (0, 100, 0),
-    'Potencial_Maiz_has.': (1, 835, 15),
+    'Potencial_Maiz_has.': (0, 835, 15),
     'Rendimiento_Maiz_N (kg/ha)': (0, 55000, 20000),
     '% embalse abril N': (0, 100, 77)
 }
@@ -58,7 +58,7 @@ VARIABLE_DISPLAY_NAMES = {
     'Potencial_Colza_has.': 'Potencial Colza (has)',
     'CuotaMercado_Zona_Colza': 'Cuota Mercado Zona Colza (%)',
     'Rendimiento_Colza_N (kg/ha)': 'Rendimiento Colza (kg/ha)',
-    'PrecAcum Septiembre 2024': 'Precipitación Acumulada Sept Año Actual (mm)',
+    'PrecAcum Septiembre 2024': 'Precipitaciones Acumuladas Sept Año Actual (mm)',
     
     'Ventas_Girasol_N-1': 'Ventas Girasol Año Anterior (dosis)',
     'Visitas_Girasol_N': 'Visitas Girasol Año Actual',
@@ -67,7 +67,7 @@ VARIABLE_DISPLAY_NAMES = {
     'CuotaMercado_Zona_Girasol': 'Cuota Mercado Zona Girasol (%)',
     'Potencial_Girasol_has.': 'Potencial Girasol (has)',
     'Rendimiento_Girasol_N (kg/ha)': 'Rendimiento Girasol (kg/ha)',
-    'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': 'Precipitación Acumulada Año Actual (mm)',
+    'PrecAcum  (Andalucia:EneMar2024 Resto:MarMay2024)': 'Precipitaciones Acumuladas Año Actual (mm)',
     
     'Ventas_Maiz_N-1': 'Ventas Maíz Año Anterior (dosis)',
     'Visitas_Maiz_N': 'Visitas Maíz Año Actual',
@@ -76,7 +76,7 @@ VARIABLE_DISPLAY_NAMES = {
     'CuotaMercado_Zona_Maiz': 'Cuota Mercado Zona Maíz (%)',
     'Potencial_Maiz_has.': 'Potencial Maíz (has)',
     'Rendimiento_Maiz_N (kg/ha)': 'Rendimiento Maíz (kg/ha)',
-    '% embalse abril N': 'Nivel Embalse Abril Año Actual(%)'
+    '% embalse abril N': 'Nivel Embalses Abril Año Actual(%)'
 }
 # Configuración original para el cálculo
 CROP_VARIABLES_ORIGINAL = {
